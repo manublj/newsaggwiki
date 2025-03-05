@@ -11,12 +11,11 @@ const ReportingForm = ({ show, onHide, onSubmit, initialData = {} }) => {
     HEADLINE: '',
     POST_CONTENT: '',
     PLATFORM: '',
-    REGION: '',
+    REGION: [],
     SPECTRUM: '',
     AUTHOR: '',
     URL: '',
     WHO: [],
-    WHO_TYPE: '',
     DATE_PUBLISHED: '',
     EVENT_TYPE_TAG: ''
   };
@@ -24,14 +23,9 @@ const ReportingForm = ({ show, onHide, onSubmit, initialData = {} }) => {
   const [formData, setFormData] = useState(defaultFormData);
   const [entities, setEntities] = useState([]);
   const [eventTypeTags, setEventTypeTags] = useState([]);
+  const [regions, setRegions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const WHO_TYPE_OPTIONS = [
-    { value: 'character', label: 'Character' },
-    { value: 'party', label: 'Political Party' },
-    { value: 'movement', label: 'Movement' }
-  ];
 
   const SPECTRUM_OPTIONS = [
     { value: 'LEFT', label: 'Left' },
@@ -68,8 +62,23 @@ const ReportingForm = ({ show, onHide, onSubmit, initialData = {} }) => {
       }
     };
 
+    const fetchRegions = async () => {
+      try {
+        const data = await getTableData('regions');
+        if (data && Array.isArray(data)) {
+          setRegions(data.map(region => ({
+            value: region.region_id,
+            label: region.region_name
+          })));
+        }
+      } catch (err) {
+        console.error('Error fetching regions:', err);
+      }
+    };
+
     fetchEntities();
     fetchEventTypeTags();
+    fetchRegions();
   }, []);
 
   useEffect(() => {
@@ -111,7 +120,7 @@ const ReportingForm = ({ show, onHide, onSubmit, initialData = {} }) => {
 
   const mapFormDataToDbSchema = (data) => {
     return {
-      title: data.HEADLINE || '',
+      headline: data.HEADLINE || '',
       description: data.POST_CONTENT || '',
       event_date: data.DATE_PUBLISHED || '',
       reporting_date: new Date().toISOString().split('T')[0],
@@ -121,12 +130,160 @@ const ReportingForm = ({ show, onHide, onSubmit, initialData = {} }) => {
       category: 'reporting',
       entity_id: data.WHO && Array.isArray(data.WHO) && data.WHO.length > 0 ? data.WHO[0].value : null,
       event_type_tag: data.EVENT_TYPE_TAG || '',
-      location: data.REGION || '',
+      location: data.REGION && Array.isArray(data.REGION) && data.REGION.length > 0 ? data.REGION.map(region => region.value).join(', ') : '',
       source_link: data.URL || ''
     };
   };
 
-  const mandatoryFields = ['SOURCE_TYPE', 'HEADLINE', 'URL', 'REGION'];
+  const renderReportingFields = () => (
+    <>
+      <Form.Group className="mb-3">
+        <Form.Label>Source Type*</Form.Label>
+        <Form.Select
+          name="SOURCE_TYPE"
+          value={formData.SOURCE_TYPE}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select Source Type</option>
+          <option value="social media post">Social Media Post</option>
+          <option value="article">Article</option>
+        </Form.Select>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Headline*</Form.Label>
+        <Form.Control
+          type="text"
+          name="HEADLINE"
+          value={formData.HEADLINE}
+          onChange={handleChange}
+          required
+        />
+      </Form.Group>
+
+      {formData.SOURCE_TYPE === 'social media post' && (
+        <>
+          <Form.Group className="mb-3">
+            <Form.Label>Post Content*</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              name="POST_CONTENT"
+              value={formData.POST_CONTENT}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Platform*</Form.Label>
+            <Form.Select
+              name="PLATFORM"
+              value={formData.PLATFORM}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Platform</option>
+              <option value="FB">Facebook</option>
+              <option value="IG">Instagram</option>
+              <option value="X">Twitter</option>
+              <option value="YT">YouTube</option>
+            </Form.Select>
+          </Form.Group>
+        </>
+      )}
+
+      <Form.Group className="mb-3">
+        <Form.Label>Region</Form.Label>
+        <NotionMultiSelect
+          options={regions}
+          value={formData.REGION}
+          onChange={(value) => handleMultiSelectChange('REGION', value)}
+          labelledBy="Select Region"
+          allowNew={true}
+          placeholder="Search or add new regions..."
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Spectrum</Form.Label>
+        <Form.Select
+          name="SPECTRUM"
+          value={formData.SPECTRUM}
+          onChange={handleChange}
+        >
+          <option value="">Select an option</option>
+          {SPECTRUM_OPTIONS.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Author</Form.Label>
+        <Form.Control
+          type="text"
+          name="AUTHOR"
+          value={formData.AUTHOR}
+          onChange={handleChange}
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>URL*</Form.Label>
+        <Form.Control
+          type="url"
+          name="URL"
+          value={formData.URL}
+          onChange={handleChange}
+          required
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>WHO</Form.Label>
+        <NotionMultiSelect
+          options={entities}
+          value={formData.WHO}
+          onChange={(value) => handleMultiSelectChange('WHO', value)}
+          labelledBy="Select WHO"
+          allowNew={true}
+          placeholder="Search or add new entities..."
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Date Published</Form.Label>
+        <Form.Control
+          type="date"
+          name="DATE_PUBLISHED"
+          value={formData.DATE_PUBLISHED}
+          onChange={handleChange}
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Event Type Tag</Form.Label>
+        <Form.Select
+          name="EVENT_TYPE_TAG"
+          value={formData.EVENT_TYPE_TAG}
+          onChange={handleChange}
+        >
+          <option value="">Select Event Type</option>
+          {eventTypeTags.map(tag => (
+            <option key={tag.value} value={tag.value}>
+              {tag.label}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+    </>
+  );
+
+  const mandatoryFields = ['SOURCE_TYPE', 'HEADLINE', 'URL'];
   const isValid = mandatoryFields.every(field => formData[field]);
 
   return (
@@ -136,173 +293,15 @@ const ReportingForm = ({ show, onHide, onSubmit, initialData = {} }) => {
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>Source Type*</Form.Label>
-            <Form.Select
-              name="SOURCE_TYPE"
-              value={formData.SOURCE_TYPE}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Source Type</option>
-              <option value="social media post">Social Media Post</option>
-              <option value="article">Article</option>
-            </Form.Select>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Headline*</Form.Label>
-            <Form.Control
-              type="text"
-              name="HEADLINE"
-              value={formData.HEADLINE}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-
-          {formData.SOURCE_TYPE === 'social media post' && (
-            <>
-              <Form.Group className="mb-3">
-                <Form.Label>Post Content*</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  name="POST_CONTENT"
-                  value={formData.POST_CONTENT}
-                  onChange={handleChange}
-                  required
-                />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Platform*</Form.Label>
-                <Form.Select
-                  name="PLATFORM"
-                  value={formData.PLATFORM}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select Platform</option>
-                  <option value="FB">Facebook</option>
-                  <option value="IG">Instagram</option>
-                  <option value="X">Twitter</option>
-                  <option value="YT">YouTube</option>
-                </Form.Select>
-              </Form.Group>
-            </>
-          )}
-
-          <Form.Group className="mb-3">
-            <Form.Label>Region*</Form.Label>
-            <Form.Control
-              type="text"
-              name="REGION"
-              value={formData.REGION}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Spectrum</Form.Label>
-            <Form.Select
-              name="SPECTRUM"
-              value={formData.SPECTRUM}
-              onChange={handleChange}
-            >
-              <option value="">Select Spectrum</option>
-              {SPECTRUM_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Author</Form.Label>
-            <Form.Control
-              type="text"
-              name="AUTHOR"
-              value={formData.AUTHOR}
-              onChange={handleChange}
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>URL*</Form.Label>
-            <Form.Control
-              type="url"
-              name="URL"
-              value={formData.URL}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>WHO</Form.Label>
-            <NotionMultiSelect
-              options={entities}
-              value={formData.WHO}
-              onChange={(value) => handleMultiSelectChange('WHO', value)}
-              labelledBy="Select WHO"
-              allowNew={true}
-              placeholder="Search or add new entities..."
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>WHO_TYPE</Form.Label>
-            <Form.Select
-              name="WHO_TYPE"
-              value={formData.WHO_TYPE}
-              onChange={handleChange}
-            >
-              <option value="">Select WHO Type</option>
-              {WHO_TYPE_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Date Published</Form.Label>
-            <Form.Control
-              type="date"
-              name="DATE_PUBLISHED"
-              value={formData.DATE_PUBLISHED}
-              onChange={handleChange}
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Event Type Tag</Form.Label>
-            <Form.Select
-              name="EVENT_TYPE_TAG"
-              value={formData.EVENT_TYPE_TAG}
-              onChange={handleChange}
-            >
-              <option value="">Select Event Type</option>
-              {eventTypeTags.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-          
-          <div className="d-flex justify-content-end mt-3">
-            <Button variant="secondary" onClick={onHide} className="me-2">
-              Cancel
-            </Button>
-            <Button variant="primary" type="submit" disabled={loading || !isValid}>
-              {loading ? 'Submitting...' : 'Submit'}
-            </Button>
-          </div>
-          
-          {error && (
-            <div className="alert alert-danger mt-3">
-              {error}
-            </div>
-          )}
+          {renderReportingFields()}
+          {error && <div className="text-danger mt-2">{error}</div>}
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={loading || !isValid}
+          >
+            {loading ? 'Submitting...' : 'Submit'}
+          </Button>
         </Form>
       </Modal.Body>
     </Modal>

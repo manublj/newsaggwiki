@@ -12,7 +12,10 @@ const InstancesPage = () => {
   const instanceTypes = [
     { value: 'discrimination', label: 'Discrimination' },
     { value: 'sexual_abuse', label: 'Sexual Abuse' },
-    { value: 'exploitation', label: 'Exploitation' }
+    { value: 'exploitation', label: 'Exploitation' },
+    { value: 'state_violence', label: 'State Violence' },
+    { value: 'state_sponsored_terrorism', label: 'State Sponsored Terrorism' },
+    { value: 'religious_stupidity', label: 'Religious Stupidity' }
   ];
 
   useEffect(() => {

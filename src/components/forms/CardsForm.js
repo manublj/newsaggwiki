@@ -3,21 +3,20 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import { addRowToTable, getTableData } from '../../api/googleSheetsApi';
 import NotionMultiSelect from '../NotionMultiSelect';
 
-const CardsForm = ({ show, onHide, onSubmit }) => {
+const EntitiesForm = ({ show, onHide, onSubmit }) => {
   const [formData, setFormData] = useState({
-    WHO: [],
-    WHO_TYPE: '',
+    entity_id: '',
+    WHO: '',
     SPECTRUM: '',
-    name: '',           // New field for entity name
-    entity_type: '',    // New field for entity type
-    description: ''      // New field for entity description
+    bio: '',
+    entity_type: ''
   });
   const [entities, setEntities] = useState([]);
 
   useEffect(() => {
     const fetchEntities = async () => {
       try {
-        const data = await getTableData('entities');
+        const data = await getTableData('ENTITIES');
         if (data && Array.isArray(data)) {
           setEntities(data.map(entity => ({
             value: entity.entity_id || entity.name,
@@ -44,35 +43,26 @@ const CardsForm = ({ show, onHide, onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Map data for CARDS table
-      const mappedData = {
-        WHO: formData.WHO.map(option => option.value),
-        WHO_TYPE: formData.WHO_TYPE,
+      // Map data for ENTITIES table
+      const entityData = {
+        entity_id: formData.entity_id,
+        WHO: formData.WHO,
+        bio: formData.bio,
+        entity_type: formData.entity_type,
         SPECTRUM: formData.SPECTRUM
       };
-      
-      // Add entry to CARDS table
-      await addRowToTable('CARDS', mappedData);
 
-      // Map data for entities table
-      const entityData = {
-        name: formData.name,
-        entity_type: formData.entity_type,
-        description: formData.description
-      };
-
-      // Add entry to entities table
-      await addRowToTable('entities', entityData);
+      // Add entry to ENTITIES table
+      await addRowToTable('ENTITIES', entityData);
 
       onSubmit();
       onHide();
       setFormData({
-        WHO: [],
-        WHO_TYPE: '',
+        entity_id: '',
+        WHO: '',
         SPECTRUM: '',
-        name: '',
-        entity_type: '',
-        description: ''
+        bio: '',
+        entity_type: ''
       });
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -87,8 +77,8 @@ const CardsForm = ({ show, onHide, onSubmit }) => {
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
-          <Form.Group controlId="formWho">
-            <Form.Label>Who</Form.Label>
+          <Form.Group className="mb-3">
+            <Form.Label>WHO (Entity Name)</Form.Label>
             <NotionMultiSelect
               options={entities}
               value={formData.WHO}
@@ -97,50 +87,6 @@ const CardsForm = ({ show, onHide, onSubmit }) => {
               allowNew={true}
               placeholder="Search or add new entities..."
             />
-          </Form.Group>
-          <Form.Group controlId="formEntityName">
-            <Form.Label>Entity Name</Form.Label>
-            <Form.Control
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="formEntityType">
-            <Form.Label>Entity Type</Form.Label>
-            <Form.Control
-              type="text"
-              name="entity_type"
-              value={formData.entity_type}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="formEntityDescription">
-            <Form.Label>Entity Description</Form.Label>
-            <Form.Control
-              type="text"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="formWhoType">
-            <Form.Label>Who Type</Form.Label>
-            <Form.Select
-              name="WHO_TYPE"
-              value={formData.WHO_TYPE}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select an option</option>
-              <option value="Character">Character</option>
-              <option value="Political Party">Political Party</option>
-              <option value="Movement">Movement</option>
-            </Form.Select>
           </Form.Group>
           <Form.Group controlId="formSpectrum">
             <Form.Label>Spectrum</Form.Label>
@@ -155,6 +101,29 @@ const CardsForm = ({ show, onHide, onSubmit }) => {
               <option value="RIGHT">Right</option>
             </Form.Select>
           </Form.Group>
+          <Form.Group controlId="formEntityBio">
+            <Form.Label>Bio</Form.Label>
+            <Form.Control
+              type="text"
+              name="bio"
+              value={formData.bio}
+              onChange={handleChange}
+            />
+          </Form.Group>
+          <Form.Group controlId="formEntityType">
+            <Form.Label>Entity Type</Form.Label>
+            <Form.Select
+              name="entity_type"
+              value={formData.entity_type}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select an option</option>
+              <option value="Character">Character</option>
+              <option value="Party">Party</option>
+              <option value="Movement">Movement</option>
+            </Form.Select>
+          </Form.Group>
           <Button variant="primary" type="submit">
             Submit
           </Button>
@@ -164,4 +133,4 @@ const CardsForm = ({ show, onHide, onSubmit }) => {
   );
 };
 
-export default CardsForm;
+export default EntitiesForm;

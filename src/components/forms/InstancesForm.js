@@ -1,37 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import { addRowToTable, getTableData } from '../../api/googleSheetsApi';
-import NotionMultiSelect from '../NotionMultiSelect';
+import { addRowToTable } from '../../api/googleSheetsApi';
+import NotionMultiSelect from '../NotionMultiSelect'; // Assuming NotionMultiSelect is in the same directory
 
 const InstancesForm = ({ show, onHide, onSubmit }) => {
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    instance_type: 'discrimination',
-    date_reported: '',
-    location: '',
-    source_link: '',
-    WHO: []
+    INSTANCE_TYPE: '',
+    HEADLINE: '',
+    POST_CONTENT: '',
+    LOCATION: '',
+    DATE_REPORTED: '',
+    URL: '',
+    SPECTRUM: ''
   });
-  const [entities, setEntities] = useState([]);
 
-  useEffect(() => {
-    const fetchEntities = async () => {
-      try {
-        const data = await getTableData('entities');
-        if (data && Array.isArray(data)) {
-          setEntities(data.map(entity => ({
-            value: entity.entity_id || entity.name,
-            label: entity.name
-          })));
-        }
-      } catch (err) {
-        console.error('Error fetching entities:', err);
-      }
-    };
+  const instanceTypes = [
+    { value: 'discrimination', label: 'Discrimination' },
+    { value: 'sexual_abuse', label: 'Sexual Abuse' },
+    { value: 'exploitation', label: 'Exploitation' },
+    { value: 'state_violence', label: 'State Violence' },
+    { value: 'state_sponsored_terrorism', label: 'State Sponsored Terrorism' },
+    { value: 'religious_stupidity', label: 'Religious Stupidity' }
+  ];
 
-    fetchEntities();
-  }, [getTableData]); // Add getTableData as a dependency
+  const locations = [
+    // Assuming locations is an array of options
+    // You need to populate this array with your actual location options
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,26 +40,17 @@ const InstancesForm = ({ show, onHide, onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const mappedData = {
-        title: formData.title,
-        description: formData.description,
-        instance_type: formData.instance_type,
-        date_reported: formData.date_reported,
-        location: formData.location,
-        source_link: formData.source_link,
-        entity_id: formData.WHO && Array.isArray(formData.WHO) && formData.WHO.length > 0 ? formData.WHO[0].value : null
-      };
-      await addRowToTable('instances', mappedData);
+      await addRowToTable('instances', formData);
       onSubmit();
       onHide();
       setFormData({
-        title: '',
-        description: '',
-        instance_type: 'discrimination',
-        date_reported: '',
-        location: '',
-        source_link: '',
-        WHO: []
+        INSTANCE_TYPE: '',
+        HEADLINE: '',
+        POST_CONTENT: '',
+        LOCATION: '',
+        DATE_REPORTED: '',
+        URL: '',
+        SPECTRUM: ''
       });
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -75,84 +61,91 @@ const InstancesForm = ({ show, onHide, onSubmit }) => {
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
-        <Modal.Title>Report Instance</Modal.Title>
+        <Modal.Title>Add Instance Entry</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
-          <Form.Group controlId="formTitle">
-            <Form.Label>Title</Form.Label>
-            <Form.Control
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="formDescription">
-            <Form.Label>Description</Form.Label>
-            <Form.Control
-              as="textarea"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
           <Form.Group controlId="formInstanceType">
             <Form.Label>Instance Type</Form.Label>
-            <Form.Control
-              as="select"
-              name="instance_type"
-              value={formData.instance_type}
-              onChange={handleChange}
+            <Form.Select 
+              name="INSTANCE_TYPE" 
+              value={formData.INSTANCE_TYPE} 
+              onChange={handleChange} 
+              required
             >
-              <option value="discrimination">Discrimination</option>
-              <option value="harassment">Harassment</option>
-              <option value="other">Other</option>
-            </Form.Control>
+              <option value="">Select Instance Type</option>
+              {instanceTypes.map(type => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </Form.Select>
           </Form.Group>
-          <Form.Group controlId="formWHO" className="mb-3">
-            <Form.Label>WHO</Form.Label>
+          <Form.Group controlId="formHeadline">
+            <Form.Label>Headline</Form.Label>
+            <Form.Control 
+              type="text" 
+              name="HEADLINE" 
+              value={formData.HEADLINE} 
+              onChange={handleChange} 
+              required 
+            />
+          </Form.Group>
+          <Form.Group controlId="formPostContent">
+            <Form.Label>Post Content</Form.Label>
+            <Form.Control 
+              as="textarea" 
+              rows={3} 
+              name="POST_CONTENT" 
+              value={formData.POST_CONTENT} 
+              onChange={handleChange} 
+              required 
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Location</Form.Label>
             <NotionMultiSelect
-              options={entities}
-              value={formData.WHO}
-              onChange={(value) => handleMultiSelectChange('WHO', value)}
-              labelledBy="Select WHO"
+              options={locations}
+              value={formData.LOCATION}
+              onChange={(value) => handleMultiSelectChange('LOCATION', value)}
+              labelledBy="Select Location"
               allowNew={true}
-              placeholder="Search or add new entities..."
+              placeholder="Search or add new locations..."
             />
           </Form.Group>
           <Form.Group controlId="formDateReported">
             <Form.Label>Date Reported</Form.Label>
-            <Form.Control
-              type="date"
-              name="date_reported"
-              value={formData.date_reported}
-              onChange={handleChange}
+            <Form.Control 
+              type="date" 
+              name="DATE_REPORTED" 
+              value={formData.DATE_REPORTED} 
+              onChange={handleChange} 
+              required 
             />
           </Form.Group>
-          <Form.Group controlId="formLocation">
-            <Form.Label>Location</Form.Label>
-            <Form.Control
-              type="text"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
+          <Form.Group controlId="formURL">
+            <Form.Label>URL</Form.Label>
+            <Form.Control 
+              type="url" 
+              name="URL" 
+              value={formData.URL} 
+              onChange={handleChange} 
             />
           </Form.Group>
-          <Form.Group controlId="formSourceLink">
-            <Form.Label>Source Link</Form.Label>
-            <Form.Control
-              type="url"
-              name="source_link"
-              value={formData.source_link}
+          <Form.Group controlId="formSpectrum">
+            <Form.Label>Spectrum</Form.Label>
+            <Form.Select 
+              name="SPECTRUM" 
+              value={formData.SPECTRUM} 
               onChange={handleChange}
-            />
+            >
+              <option value="">Select Spectrum</option>
+              <option value="LEFT">Left</option>
+              <option value="CENTRE">Centre</option>
+              <option value="RIGHT">Right</option>
+            </Form.Select>
           </Form.Group>
-          <Button variant="primary" type="submit">
-            Submit
-          </Button>
+          <Button variant="primary" type="submit">Submit</Button>
         </Form>
       </Modal.Body>
     </Modal>

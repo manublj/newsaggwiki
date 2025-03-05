@@ -11,7 +11,6 @@ const MOCK_DATA = {
   reporting: [],
   eventtypetags: [],
   instances: [],
-  cards: []
 };
 
 // Define the expected headers for each table in the database schema
@@ -82,6 +81,17 @@ export const getTableHeaders = (tableName) => {
         'source_link',
         'entity_id'
       ];
+    case 'entities':
+      return [
+        'card_id',
+        'title',
+        'description',
+        'WHO',
+        'LOCATION',
+        'instance_type',
+        'date_reported',
+        'source_link'
+      ];
     default:
       return [];
   }
@@ -131,6 +141,18 @@ const mapDbFieldsToUiFields = (tableName, dbData) => {
       WHO: dbData.entity_id || '',
       CATEGORY: 'instances'
     };
+  } else if (tableName.toLowerCase() === 'entities') {
+    return {
+      id: dbData.card_id || '',
+      HEADLINE: dbData.title || '',
+      POST_CONTENT: dbData.description || '',
+      INSTANCE_TYPE: dbData.instance_type || '',
+      DATE_REPORTED: dbData.date_reported || '',
+      LOCATION: dbData.LOCATION || '',
+      URL: dbData.source_link || '',
+      WHO: dbData.WHO || '',
+      CATEGORY: 'entities'
+    };
   } else {
     // For entities and other tables, return as is
     return dbData;
@@ -168,6 +190,51 @@ export const addRowToTable = async (tableName, rowData) => {
     console.error('Error adding row to table:', error);
     alert(`Error saving data: ${error.message}`);
     throw error;
+  }
+};
+
+// Function to add a row to the ENTITIES table
+export const addRowToEntitiesTable = async (data) => {
+  const { WHO, LOCATION, ...rest } = data;
+  // Process WHO and LOCATION as needed
+  // For example, convert WHO and LOCATION to arrays if they are not already
+  const processedWho = Array.isArray(WHO) ? WHO : [WHO];
+  const processedLocation = Array.isArray(LOCATION) ? LOCATION : [LOCATION];
+  
+  // Add row to the ENTITIES table
+  const response = await fetch(`${BASE_URL}/${SPREADSHEET_ID}/values/entities!A1:Z1000?valueInputOption=USER_ENTERED`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_KEY}`,
+    },
+    body: JSON.stringify({
+      "majorDimension": "ROWS",
+      "range": "entities!A1:Z1000",
+      "values": [Object.values({ ...rest, WHO: processedWho.join(','), LOCATION: processedLocation.join(',') })]
+    }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to add row to ENTITIES table');
+  }
+};
+
+// Add a function to save data to the instances table
+export const addRowToInstancesTable = async (data) => {
+  const response = await fetch(`${BASE_URL}/${SPREADSHEET_ID}/values/instances!A1:Z1000?valueInputOption=USER_ENTERED`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_KEY}`,
+    },
+    body: JSON.stringify({
+      "majorDimension": "ROWS",
+      "range": "instances!A1:Z1000",
+      "values": [Object.values(data)]
+    }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to add row to instances table');
   }
 };
 
