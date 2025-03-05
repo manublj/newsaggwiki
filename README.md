@@ -27,21 +27,50 @@ Overall, Wiki Ver8 aims to create a comprehensive platform for users to interact
 
 ## File Hierarchy
 C:\
-└── local\
-    └── SOFTWARE_DEV\
-        └── newsagg_projects\
-            └── ver-8\
-                ├── src\
-                │   ├── components\
-                │   │   ├── forms\
-                │   │   │   ├── EntryForm.js
-                │   │   │   ├── ReportingForm.js
-                │   │   │   ├── CardsForm.js
-                │   │   │   └── InstancesForm.js
-                │   │   └── NotionMultiSelect.js
-                │   └── api\
-                │       └── googleSheetsApi.js
-                └── README.md
+ └── local\
+     └── SOFTWARE_DEV\
+         └── newsagg_projects\
+             └── ver-8\
+                 ├── .env
+                 ├── .git\
+                 ├── .gitignore
+                 ├── README.md
+                 ├── build\
+                 ├── config-overrides.js
+                 ├── node_modules\
+                 ├── package-lock.json
+                 ├── package.json
+                 ├── public\
+                 │   ├── index.html
+                 │   ├── manifest.json
+                 │   └── service-worker.js
+                 └── src\
+                     ├── App.css
+                     ├── App.js
+                     ├── api\
+                     │   └── googleSheetsApi.js
+                     ├── components\
+                     │   ├── ArticleCard.js
+                     │   ├── ArticleReader.js
+                     │   ├── CardView.js
+                     │   ├── FloatingButton.js
+                     │   ├── Header.js
+                     │   ├── NotionMultiSelect.css
+                     │   ├── NotionMultiSelect.js
+                     │   ├── SearchBar.js
+                     │   └── forms\
+                     │       ├── CardsForm.js
+                     │       ├── EntryForm.js
+                     │       ├── InstancesForm.js
+                     │       └── ReportingForm.js
+                     ├── index.css
+                     ├── index.js
+                     ├── pages\
+                     │   ├── CardsPage.js
+                     │   ├── HomePage.js
+                     │   ├── InstancesPage.js
+                     │   └── ReportingPage.js
+                     └── serviceWorkerRegistration.js
 ```
 
 ## Installation Instructions
