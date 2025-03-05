@@ -170,7 +170,7 @@ The `EntryForm` dynamically adjusts its fields based on the selected `Source Typ
 ### 3. REPORTING Table
 **Schema**
 - `headline`: Headline of the news event.
-- `description`: Detailed description of the event.
+- `description`: Detailed description of the event.[When the source type is 'social media post', the post content is treated as the description.]
 - `event_date`: Date of the event.
 - `reporting_date`: Date the event was reported.
 - `src_type`: Type of source (post, article).
@@ -180,6 +180,7 @@ The `EntryForm` dynamically adjusts its fields based on the selected `Source Typ
 - `event_type_tag`: Type of event.
 - `location`: Location of the event.
 - `source_link`: URL of the source.
+
 **Dynamic Form Structure**
 The `ReportingForm` dynamically adapts based on the `Source Type` and includes fields to capture detailed reporting information:
 - **Source Type** (dropdown): Determines the fields displayed in the form.

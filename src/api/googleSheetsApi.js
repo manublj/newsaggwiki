@@ -245,7 +245,7 @@ export const addRowToReportingTable = async (data) => {
   const row = {
     report_id: data.report_id,
     headline: data.headline,
-    content: data.content,
+    description: data.description,
     entities: data.entities.join(','),
     regions: data.regions.join(',')
   };

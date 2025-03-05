@@ -121,7 +121,7 @@ const ReportingForm = ({ show, onHide, onSubmit, initialData = {} }) => {
   const mapFormDataToDbSchema = (data) => {
     return {
       headline: data.HEADLINE || '',
-      description: data.POST_CONTENT || '',
+      description: data.SOURCE_TYPE === 'article' ? data.POST_CONTENT || '' : '',
       event_date: data.DATE_PUBLISHED || '',
       reporting_date: new Date().toISOString().split('T')[0],
       src_type: data.SOURCE_TYPE || 'article',
@@ -162,36 +162,49 @@ const ReportingForm = ({ show, onHide, onSubmit, initialData = {} }) => {
         />
       </Form.Group>
 
+      {formData.SOURCE_TYPE === 'article' && (
+        <Form.Group className="mb-3">
+          <Form.Label>Description*</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            name="POST_CONTENT"
+            value={formData.POST_CONTENT}
+            onChange={handleChange}
+            required
+          />
+        </Form.Group>
+      )}
       {formData.SOURCE_TYPE === 'social media post' && (
-        <>
-          <Form.Group className="mb-3">
-            <Form.Label>Post Content*</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              name="POST_CONTENT"
-              value={formData.POST_CONTENT}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Description*</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            name="POST_CONTENT"
+            value={formData.POST_CONTENT}
+            onChange={handleChange}
+            required
+          />
+        </Form.Group>
+      )}
 
-          <Form.Group className="mb-3">
-            <Form.Label>Platform*</Form.Label>
-            <Form.Select
-              name="PLATFORM"
-              value={formData.PLATFORM}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Platform</option>
-              <option value="FB">Facebook</option>
-              <option value="IG">Instagram</option>
-              <option value="X">Twitter</option>
-              <option value="YT">YouTube</option>
-            </Form.Select>
-          </Form.Group>
-        </>
+      {formData.SOURCE_TYPE === 'social media post' && (
+        <Form.Group className="mb-3">
+          <Form.Label>Platform*</Form.Label>
+          <Form.Select
+            name="PLATFORM"
+            value={formData.PLATFORM}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select Platform</option>
+            <option value="FB">Facebook</option>
+            <option value="IG">Instagram</option>
+            <option value="X">Twitter</option>
+            <option value="YT">YouTube</option>
+          </Form.Select>
+        </Form.Group>
       )}
 
       <Form.Group className="mb-3">
