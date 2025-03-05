@@ -6,13 +6,18 @@ Wiki Ver8 is a Progressive Web Application (PWA) designed to serve as an interac
 
 The application is composed of four main components:
 
-1. **Homepage (Theory Table):** Acts as a "read later" section where users can collect and organize theoretical items related to political and social entities. This feature allows users to delve into theoretical frameworks and texts at their convenience.
-
-2. **Reporting Page (News Events Table):** This section is enhanced with two new fields, TIMELINE and SPECTRUM, which, when visualized using time.graphics, help users understand historical contexts and recollect events better. It provides a structured way to track and analyze news events and their implications over time.
-
-3. **Cards Page (Entities Table):** Offers three distinct views, each dedicated to a specific entity type (e.g., people, political parties, movements). This feature displays cards for each entity, functioning similarly to a "pokedex," allowing users to explore and learn about different entities in a visually engaging manner.
-
-4. **Instances Page:** Lists visible markers and instances of discrimination, exploitation, sexual harassment, abuse, domestic violence, state oppression, and other societal issues. This section aims to raise awareness and provide a comprehensive overview of such instances, facilitating better understanding and advocacy.
+1. **Homepage (Theory Table):** 
+Acts as a "read later" section where users can collect and organize theoretical items related to political and social entities. 
+This feature allows users to delve into theoretical frameworks and texts at their convenience.
+2. **Reporting Page (News Events Table):** 
+This section is enhanced with two new fields, TIMELINE and SPECTRUM, which, when visualized using time.graphics, help users understand historical contexts and recollect events better. 
+It provides a structured way to track and analyze news events and their implications over time.
+3. **Cards Page (Entities Table):** 
+Offers three distinct views, each dedicated to a specific entity type (e.g., people, political parties, movements).
+This feature displays cards for each entity, functioning similarly to a "pokedex," allowing users to explore and learn about different entities in a visually engaging manner.
+4. **Instances Page:** 
+Lists visible markers and instances of discrimination, exploitation, sexual harassment, abuse, domestic violence, state oppression, and other societal issues. 
+This section aims to raise awareness and provide a comprehensive overview of such instances, facilitating better understanding and advocacy.
 
 Overall, Wiki Ver8 aims to create a comprehensive platform for users to interact with and analyze political and news content, offering both depth and breadth in its exploration of theoretical and real-world events.
 
