@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Tabs, Tab, Button, Spinner, Table, Form } from 'react-bootstrap';
 import CardView from '../components/CardView';
-import CardsForm from '../components/forms/CardsForm';
+import EntitiesForm from '../components/forms/EntitiesForm';
 import SearchBar from '../components/SearchBar';
 import { getSheetData, addRowToSheet } from '../api/googleSheetsApi';
 import { MultiSelect } from 'react-multi-select-component';
@@ -199,7 +199,7 @@ const CardsPage = () => {
       )}
 
       {showForm && (
-        <CardsForm
+        <EntitiesForm
           show={showForm}
           onHide={() => setShowForm(false)}
           onSubmit={handleFormSubmit}

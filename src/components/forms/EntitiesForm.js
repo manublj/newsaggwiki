@@ -6,7 +6,7 @@ import NotionMultiSelect from '../NotionMultiSelect';
 const EntitiesForm = ({ show, onHide, onSubmit }) => {
   const [formData, setFormData] = useState({
     entity_id: '',
-    WHO: '',
+    WHO: [],
     SPECTRUM: '',
     bio: '',
     entity_type: ''
@@ -37,7 +37,7 @@ const EntitiesForm = ({ show, onHide, onSubmit }) => {
   };
 
   const handleMultiSelectChange = (name, value) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: Array.isArray(value) ? value : [value] }));
   };
 
   const handleSubmit = async (e) => {
@@ -59,7 +59,7 @@ const EntitiesForm = ({ show, onHide, onSubmit }) => {
       onHide();
       setFormData({
         entity_id: '',
-        WHO: '',
+        WHO: [],
         SPECTRUM: '',
         bio: '',
         entity_type: ''

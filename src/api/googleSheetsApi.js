@@ -6,17 +6,17 @@ const BASE_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
 
 // Mock data for development and testing
 const MOCK_DATA = {
-  entities: [],
-  theory: [],
-  reporting: [],
-  eventtypetags: [],
-  instances: [],
+  ENTITIES: [],
+  THEORY: [],
+  REPORTING: [],
+  EVENTTYPETAGS: [],
+  INSTANCES: [],
 };
 
 // Define the expected headers for each table in the database schema
 export const getTableHeaders = (tableName) => {
-  switch (tableName.toLowerCase()) {
-    case 'entities':
+  switch (tableName.toUpperCase()) {
+    case 'ENTITIES':
       return [
         'entity_id',
         'name',
@@ -24,7 +24,7 @@ export const getTableHeaders = (tableName) => {
         'description',
         'created_at'
       ];
-    case 'theory':
+    case 'THEORY':
       return [
         'theory_id',
         'title',
@@ -40,7 +40,7 @@ export const getTableHeaders = (tableName) => {
         'entity_id',
         'references'
       ];
-    case 'reporting':
+    case 'REPORTING':
       return [
         'report_id',
         'title',
@@ -56,7 +56,7 @@ export const getTableHeaders = (tableName) => {
         'location',
         'source_link'
       ];
-    case 'eventtypetags':
+    case 'EVENTTYPETAGS':
       return [
         'tag_id',
         'tag_name',
@@ -65,12 +65,12 @@ export const getTableHeaders = (tableName) => {
         'parent_tag',
         'description'
       ];
-    case 'reportingeventtype':
+    case 'REPORTINGEVENTTYPE':
       return [
         'report_id',
         'tag_id'
       ];
-    case 'instances':
+    case 'INSTANCES':
       return [
         'instance_id',
         'title',
@@ -81,17 +81,6 @@ export const getTableHeaders = (tableName) => {
         'source_link',
         'entity_id'
       ];
-    case 'entities':
-      return [
-        'card_id',
-        'title',
-        'description',
-        'WHO',
-        'LOCATION',
-        'instance_type',
-        'date_reported',
-        'source_link'
-      ];
     default:
       return [];
   }
@@ -99,7 +88,7 @@ export const getTableHeaders = (tableName) => {
 
 // Map database field names to UI field names
 const mapDbFieldsToUiFields = (tableName, dbData) => {
-  if (tableName.toLowerCase() === 'theory') {
+  if (tableName.toUpperCase() === 'THEORY') {
     return {
       id: dbData.theory_id || '',
       HEADLINE: dbData.title || '',
@@ -115,7 +104,7 @@ const mapDbFieldsToUiFields = (tableName, dbData) => {
       WHO: dbData.entity_id || '',
       URL: dbData.references || ''
     };
-  } else if (tableName.toLowerCase() === 'reporting') {
+  } else if (tableName.toUpperCase() === 'REPORTING') {
     return {
       id: dbData.report_id || '',
       HEADLINE: dbData.title || '',
@@ -129,7 +118,7 @@ const mapDbFieldsToUiFields = (tableName, dbData) => {
       REGION: dbData.location || '',
       URL: dbData.source_link || ''
     };
-  } else if (tableName.toLowerCase() === 'instances') {
+  } else if (tableName.toUpperCase() === 'INSTANCES') {
     return {
       id: dbData.instance_id || '',
       HEADLINE: dbData.title || '',
@@ -141,7 +130,7 @@ const mapDbFieldsToUiFields = (tableName, dbData) => {
       WHO: dbData.entity_id || '',
       CATEGORY: 'instances'
     };
-  } else if (tableName.toLowerCase() === 'entities') {
+  } else if (tableName.toUpperCase() === 'ENTITIES') {
     return {
       id: dbData.card_id || '',
       HEADLINE: dbData.title || '',
@@ -165,7 +154,7 @@ export const getTableData = async (tableName) => {
   console.log(`Using mock data for ${tableName}`);
   
   // Return mock data for the requested table
-  const mockDataForTable = MOCK_DATA[tableName.toLowerCase()] || [];
+  const mockDataForTable = MOCK_DATA[tableName.toUpperCase()] || [];
   
   // Map the mock data to UI fields if needed
   return mockDataForTable.map(item => mapDbFieldsToUiFields(tableName, item));
@@ -202,7 +191,7 @@ export const addRowToEntitiesTable = async (data) => {
   const processedLocation = Array.isArray(LOCATION) ? LOCATION : [LOCATION];
   
   // Add row to the ENTITIES table
-  const response = await fetch(`${BASE_URL}/${SPREADSHEET_ID}/values/entities!A1:Z1000?valueInputOption=USER_ENTERED`, {
+  const response = await fetch(`${BASE_URL}/${SPREADSHEET_ID}/values/ENTITIES!A1:Z1000?valueInputOption=USER_ENTERED`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -210,7 +199,7 @@ export const addRowToEntitiesTable = async (data) => {
     },
     body: JSON.stringify({
       "majorDimension": "ROWS",
-      "range": "entities!A1:Z1000",
+      "range": "ENTITIES!A1:Z1000",
       "values": [Object.values({ ...rest, WHO: processedWho.join(','), LOCATION: processedLocation.join(',') })]
     }),
   });
@@ -221,7 +210,7 @@ export const addRowToEntitiesTable = async (data) => {
 
 // Add a function to save data to the instances table
 export const addRowToInstancesTable = async (data) => {
-  const response = await fetch(`${BASE_URL}/${SPREADSHEET_ID}/values/instances!A1:Z1000?valueInputOption=USER_ENTERED`, {
+  const response = await fetch(`${BASE_URL}/${SPREADSHEET_ID}/values/INSTANCES!A1:Z1000?valueInputOption=USER_ENTERED`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -229,13 +218,38 @@ export const addRowToInstancesTable = async (data) => {
     },
     body: JSON.stringify({
       "majorDimension": "ROWS",
-      "range": "instances!A1:Z1000",
+      "range": "INSTANCES!A1:Z1000",
       "values": [Object.values(data)]
     }),
   });
   if (!response.ok) {
     throw new Error('Failed to add row to instances table');
   }
+};
+
+// Add a function to save data to the theory table
+export const addRowToTheoryTable = async (data) => {
+  const row = {
+    theory_id: data.theory_id,
+    title: data.title,
+    description: data.description,
+    keywords: data.keywords.join(','),
+    authors: data.authors.join(','),
+    domains: data.domains.join(',')
+  };
+  await addRowToTable('THEORY', row);
+};
+
+// Add a function to save data to the reporting table
+export const addRowToReportingTable = async (data) => {
+  const row = {
+    report_id: data.report_id,
+    headline: data.headline,
+    content: data.content,
+    entities: data.entities.join(','),
+    regions: data.regions.join(',')
+  };
+  await addRowToTable('REPORTING', row);
 };
 
 // For backward compatibility

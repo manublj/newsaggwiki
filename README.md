@@ -64,7 +64,7 @@ C:\
                      │   ├── NotionMultiSelect.js
                      │   ├── SearchBar.js
                      │   └── forms\
-                     │       ├── CardsForm.js
+                     │       ├── EntitiesForm.js
                      │       ├── EntryForm.js
                      │       ├── InstancesForm.js
                      │       └── ReportingForm.js
@@ -76,7 +76,6 @@ C:\
                      │   ├── InstancesPage.js
                      │   └── ReportingPage.js
                      └── serviceWorkerRegistration.js
-```
 
 ## Installation Instructions
 1. Clone the repository:
@@ -108,7 +107,7 @@ C:\
 - **Reported Instances:** Track and categorize reported instances of discrimination, sexual abuse, and exploitation.
 
 ## Table Structure and Alignment
-### 1. Entities Table
+### 1. ENTITIES Table
 **Schema**
 - `entity_id`: Unique identifier for each entity (auto-generated).
 - `WHO`: Multi-select field for entity names.
@@ -117,7 +116,7 @@ C:\
 - `SPECTRUM`: Political spectrum (LEFT, CENTRE, RIGHT).
 
 **Dynamic Form Structure**
-The `CardsForm` is designed to manage entity data, providing a dynamic interface for entity categorization:
+The `EntitiesForm` is designed to manage entity data, providing a dynamic interface for entity categorization:
 - **entity_id** (text input): Unique identifier for the entity (auto-generated).
 - **WHO** (multi-select): Allows selection of entity names using NotionMultiSelect.
 - **Bio** (text input): Biographical information about the entity.
@@ -127,11 +126,11 @@ The `CardsForm` is designed to manage entity data, providing a dynamic interface
   - Options: Left, Centre, Right
 
 **Google Sheets API**: 
-- `addRowToEntitiesTable`: Handles adding rows to the `entities` sheet.
+- `addRowToEntitiesTable`: Handles adding rows to the `ENTITIES` sheet.
 - [Code Reference](cci:1://file:///c:/local/SOFTWARE_DEV/newsagg_projects/ver-8/src/api/googleSheetsApi.js:195:0-219:2)
 
 
-### 2. Theory Table
+### 2. THEORY Table
 **Schema**
 - `WHO`: Name of the entity.
 - `title`: Title of the theory.
@@ -164,11 +163,11 @@ The `EntryForm` dynamically adjusts its fields based on the selected `Source Typ
 - **Date Published** (date input): Date when the entry was published.
 
 **Google Sheets API**: 
-- `addRowToTheoryTable`: Handles adding rows to the `theory` sheet.
+- `addRowToTheoryTable`: Handles adding rows to the `THEORY` sheet.
 - [Code Reference](cci:1://file:///c:/local/SOFTWARE_DEV/newsagg_projects/ver-8/src/api/googleSheetsApi.js:220:0-250:2)
 
 
-### 3. Reporting Table
+### 3. REPORTING Table
 **Schema**
 - `headline`: Headline of the news event.
 - `description`: Detailed description of the event.
@@ -197,10 +196,10 @@ The `ReportingForm` dynamically adapts based on the `Source Type` and includes f
 - **Event Type Tag** (dropdown): Categorizes the type of event.
 
 **Google Sheets API**: `addRowToReportingTable`
-- `addRowToReportingTable`: Handles adding rows to the `reporting` sheet.
+- `addRowToReportingTable`: Handles adding rows to the `REPORTING` sheet.
 - [Code Reference](cci:1://file:///c:/local/SOFTWARE_DEV/newsagg_projects/ver-8/src/api/googleSheetsApi.js:251:0-280:2)
 
-### 4. Instances Table
+### 4. INSTANCES Table
 **Schema**
 - `INSTANCE_TYPE`: Type of instance (discrimination, sexual_abuse, exploitation, state_violence, state_sponsored_terrorism, religious_stupidity).
 - `HEADLINE`: Headline of the instance.
@@ -223,7 +222,7 @@ The `InstancesForm` captures instances of societal issues, dynamically structure
   - Options: Left, Centre, Right
 
 **Google Sheets API**: [addRowToInstancesTable](cci:1://file:///c:/local/SOFTWARE_DEV/newsagg_projects/ver-8/src/api/googleSheetsApi.js:221:0-238:2)
-  - Handles adding rows to the `instances` sheet.
+  - Handles adding rows to the `INSTANCES` sheet.
 
 ## Contributing
 1. Fork the repository.
